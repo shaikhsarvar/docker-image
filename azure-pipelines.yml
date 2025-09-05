@@ -1,0 +1,21 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'nginx-custom'
+  imageTag: 'v1'
+
+steps:
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: 'latest'
+
+- script: |
+    echo "$(DOCKER_HUB_TOKEN)" | docker login -u "$(DOCKER_HUB_USERNAME)" --password-stdin
+    docker build -t $(DOCKER_HUB_USERNAME)/$(imageName):$(imageTag) .
+    docker push $(DOCKER_HUB_USERNAME)/$(imageName):$(imageTag)
+  displayName: 'Build and Push to Docker Hub'
+
