@@ -5,6 +5,7 @@ pool:
   name: 'local pc'  # Your self-hosted agent name
 
 variables:
+  dockerHubUsername: 'sksarvar'
   imageName: 'nginx-custom'
   imageTag: 'v1'
   dockerRegistryServiceConnection: 'dockerhub-azuredevops'
@@ -14,11 +15,23 @@ steps:
   displayName: 'Build and Push Docker Image to Docker Hub'
   inputs:
     containerRegistry: $(dockerRegistryServiceConnection)
-    repository: 'sksarvar/$(imageName)'  # 👈 Your actual Docker Hub username
+    repository: '$(dockerHubUsername)/$(imageName)'
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
     tags: |
       $(imageTag)
+
+- script: |
+    echo "Pulling image..."
+    docker pull $(dockerHubUsername)/$(imageName):$(imageTag)
+
+    echo "Stopping existing container if exists..."
+    docker rm -f nginx-custom || true
+
+    echo "Running container..."
+    docker run -d --name nginx-custom -p 8080:80 $(dockerHubUsername)/$(imageName):$(imageTag)
+  displayName: 'Deploy Docker Container on Local PC'
+
 
 
 
