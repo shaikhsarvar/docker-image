@@ -1,21 +1,23 @@
 trigger:
-- main
+- main  # Or your target branch
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Default'  # Use the correct agent pool name for your local PC agent
 
 variables:
   imageName: 'nginx-custom'
   imageTag: 'v1'
+  dockerRegistryServiceConnection: 'dockerhub-azuredevops'
 
 steps:
-- task: DockerInstaller@0
+- task: Docker@2
+  displayName: 'Build and Push Docker Image to Docker Hub'
   inputs:
-    dockerVersion: 'latest'
+    containerRegistry: $(dockerRegistryServiceConnection)
+    repository: $(DOCKER_HUB_USERNAME)/$(imageName)
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      $(imageTag)
 
-- script: |
-    echo "$(DOCKER_HUB_TOKEN)" | docker login -u "$(DOCKER_HUB_USERNAME)" --password-stdin
-    docker build -t $(DOCKER_HUB_USERNAME)/$(imageName):$(imageTag) .
-    docker push $(DOCKER_HUB_USERNAME)/$(imageName):$(imageTag)
-  displayName: 'Build and Push to Docker Hub'
 
