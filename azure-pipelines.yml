@@ -1,8 +1,8 @@
 trigger:
-- main  # Or your target branch
+- main  # Or your branch name
 
 pool:
-  name: 'local pc'  # Use the correct agent pool name for your local PC agent
+  name: 'local pc'  # Your self-hosted agent name
 
 variables:
   imageName: 'nginx-custom'
@@ -14,10 +14,11 @@ steps:
   displayName: 'Build and Push Docker Image to Docker Hub'
   inputs:
     containerRegistry: $(dockerRegistryServiceConnection)
-    repository: $(DOCKER_HUB_USERNAME)/$(imageName)
+    repository: 'sksarvar/$(imageName)'  # 👈 Your actual Docker Hub username
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
     tags: |
       $(imageTag)
+
 
 
