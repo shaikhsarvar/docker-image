@@ -2,7 +2,7 @@ trigger:
 - main  # Or your target branch
 
 pool:
-  name: 'Default'  # Use the correct agent pool name for your local PC agent
+  name: 'local pc'  # Use the correct agent pool name for your local PC agent
 
 variables:
   imageName: 'nginx-custom'
