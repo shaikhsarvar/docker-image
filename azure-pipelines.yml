@@ -36,3 +36,9 @@ steps:
     echo "Deploying to Minikube..."
     kubectl apply -f k8s-deployment.yaml
   displayName: 'Deploy to Minikube'
+- script: |
+    echo "Fetching Minikube service URL..."
+    SERVICE_URL=$(minikube service nginx-custom-service --url)
+    echo "Service is available at: $SERVICE_URL"
+  displayName: 'Get Minikube Service URL'
+  shell: bash
