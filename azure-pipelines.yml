@@ -32,6 +32,44 @@ steps:
     docker run -d --name nginx-custom -p 8080:80 $(dockerHubUsername)/$(imageName):$(imageTag)
   displayName: 'Deploy Docker Container on Local PC'
 
+- script: |
+    echo "Creating Kubernetes manifest file..."
 
+    cat <<EOF > k8s-deployment.yaml
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: nginx-custom
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: nginx-custom
+      template:
+        metadata:
+          labels:
+            app: nginx-custom
+        spec:
+          containers:
+          - name: nginx-custom
+            image: $(dockerHubUsername)/$(imageName):$(imageTag)
+            ports:
+            - containerPort: 80
+    ---
+    apiVersion: v1
+    kind: Service
+    metadata:
+      name: nginx-custom-service
+    spec:
+      selector:
+        app: nginx-custom
+      ports:
+      - protocol: TCP
+        port: 8080
+        targetPort: 80
+      type: NodePort
+    EOF
 
-
+    echo "Deploying to Minikube..."
+    kubectl apply -f k8s-deployment.yaml
+  displayName: 'Deploy to Minikube'
